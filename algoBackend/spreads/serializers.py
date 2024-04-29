@@ -1,4 +1,5 @@
-from models import SpreadProposition, SpreadOperation
+from backoffice.serializers import AdminBondSerializer
+from spreads.models import SpreadOperation, SpreadProposition
 from rest_framework import serializers
 
 from backoffice.models import AdminBond
@@ -7,12 +8,31 @@ from datetime import datetime
 class SpreadOperationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpreadOperation
-        exclude = ['deleted', 'created_at', 'updated_at']
+        exclude = ['deleted', 'created_at', 'updated_at', 'isPublic', 'isPublished']
 
 class SpreadOperationSerializer(serializers.ModelSerializer):
+    propositions = serializers.SerializerMethodField()
+    admin_bond = serializers.SerializerMethodField()
+
     class Meta:
         model = SpreadOperation
-        fields = '__all__'
+        exclude = ['deleted', 'created_at', 'updated_at', 'isPublic', 'isPublished']
+
+    def get_propositions(self, instance):
+        try:
+            propositions = instance.propositions.filter(deleted=False)
+            serializer_proposition = SpreadPropositionSerializer(instance=propositions, many=True)
+            return serializer_proposition.data
+        except Exception as e:
+            return None
+    
+    def get_admin_bond(self, instance):
+        try:
+            admin_bond = instance.admin_bond
+            serializer_admin_bond = AdminBondSerializer(instance=admin_bond)
+            return serializer_admin_bond.data
+        except Exception as e:
+            return None
 
     def validate_bond(self, value):
         """
@@ -72,9 +92,10 @@ class SpreadPropositionCreateSerializer(serializers.ModelSerializer):
         exclude = ['deleted', 'created_at', 'updated_at']
 
 class SpreadPropositionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = SpreadProposition
-        fields = '__all__'
+        exclude = ['deleted', 'created_at', 'updated_at']
 
     def validate_operation(self, value):
         """

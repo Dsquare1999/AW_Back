@@ -32,7 +32,7 @@ class SwapProposition(CreateUpdateModel, models.Model):
         ('R', 'Rejected'),
     )
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
-    operation = models.ForeignKey(SwapOperation, on_delete=models.CASCADE)
+    operation = models.ForeignKey(SwapOperation, related_name="propositions", on_delete=models.CASCADE)
     proposer = models.ForeignKey(User, on_delete=models.CASCADE)
     proposition = models.ForeignKey(Bond, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, default='P')

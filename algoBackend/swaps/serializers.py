@@ -1,5 +1,5 @@
 from datetime import datetime
-from .models import SwapOperation, SwapProposition
+from swaps.models import SwapOperation, SwapProposition
 
 from rest_framework import serializers
 from alm.models import Bond
@@ -10,9 +10,19 @@ class SwapOperationCreateSerializer(serializers.ModelSerializer):
         exclude = ['deleted', 'created_at', 'updated_at']
 
 class SwapOperationSerializer(serializers.ModelSerializer):
+    propositions = serializers.SerializerMethodField()
+    
     class Meta:
         model = SwapOperation
         fields = '__all__'
+
+    def get_propositions(self, instance):
+        try:
+            propositions = instance.propositions.filter(deleted=False)
+            serializer_proposition = SwapPropositionSerializer(instance=propositions, many=True)
+            return serializer_proposition.data
+        except Exception as e:
+            return None
 
     def validate_bond(self, value):
         """

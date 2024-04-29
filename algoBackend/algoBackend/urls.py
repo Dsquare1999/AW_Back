@@ -15,6 +15,9 @@ from op_retrait.views import OPRetraitViewset
 from op_injection.views import OPInjectionViewSet
 from rest_framework.routers import DefaultRouter
 
+from spreads.views import SpreadOperationViewSet, SpreadPropositionViewset
+from swaps.views import SwapOperationViewSet, SwapPropositionViewset
+
 
 router = DefaultRouter()
 router.register(r'bilan', BilanViewset, basename='bilan')
@@ -31,6 +34,13 @@ router.register(r'backoffice', AdminBondViewSet, basename='backoffice')
 router.register(r'op_retrait', OPRetraitViewset, basename='op_retrait')
 router.register(r'op_injection', OPInjectionViewSet, basename='op_injection')
 router.register(r'customer_loan', LoansViewSet, basename='customer_loan')
+
+router.register(r'spread_operations', SpreadOperationViewSet, basename='spread_operations')
+router.register(r'spread_propositions', SpreadPropositionViewset, basename='spread_propositions')
+
+router.register(r'swap_operations', SwapOperationViewSet, basename='swap_operations')
+router.register(r'swap_propositions', SwapPropositionViewset, basename='swap_propositions')
+
 
 # urlpatterns = router.urls
 

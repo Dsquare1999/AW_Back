@@ -35,21 +35,21 @@ class SpreadOperation(CreateUpdateModel, models.Model):
 
     bid = models.FloatField()
     ask = models.FloatField()
-    adviced_bid = models.FloatField()
-    adviced_ask = models.FloatField()
+    adviced_bid = models.FloatField(blank=True, null=True)
+    adviced_ask = models.FloatField(blank=True, null=True)
     spread = models.FloatField()
     quantity = models.IntegerField()
     order = models.IntegerField(choices=ORDERS, default=0)
     type = models.CharField(max_length=10, choices=TYPE, default='B')
     validity = models.DateField()
-    attractive = ArrayField(models.BooleanField(), size=5, default=list)
+    # attractive = ArrayField(models.BooleanField(), size=5, blank=True, null=True)
 
     description = models.TextField(default='', blank=True, null=True)
     isPublic = models.BooleanField(default=True)
     isPublished = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.admin_bond + " " + self.type + " " + self.quantity
+        return  "Spread Operation" + str(self.admin_bond)
     
 
 class SpreadProposition(CreateUpdateModel, models.Model):
@@ -60,7 +60,8 @@ class SpreadProposition(CreateUpdateModel, models.Model):
     )
 
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
-    operation = models.ForeignKey(SpreadOperation, on_delete=models.CASCADE)
+    operation = models.ForeignKey(SpreadOperation, related_name="propositions", on_delete=models.CASCADE)
+    proposer = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.FloatField()
     volume = models.IntegerField()
     status = models.CharField(max_length=50, default='P', choices=STATUS)
@@ -69,5 +70,5 @@ class SpreadProposition(CreateUpdateModel, models.Model):
     confirmation_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
-        return self.operation + " " + self.price + " " + self.volume
+        return str(self.operation) + " " + str(self.price) + " " + str(self.volume)
     

@@ -10,7 +10,7 @@ class AdminBondCreateSerializer(serializers.ModelSerializer):
 class AdminBondSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminBond
-        fields = '__all__'
+        exclude = ['deleted', 'created_at', 'updated_at']
 
     def validate_isin(self, value):
         """
