@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 from accounts.models import User
 from alm.models import Bond
@@ -14,12 +15,28 @@ class CreateUpdateModel(models.Model):
     class Meta : 
         abstract = True
 
-class Swap(CreateUpdateModel, models.Model):
-    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)    
+class SwapOperation(CreateUpdateModel, models.Model):
+    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bond = models.ForeignKey(Bond, on_delete=models.CASCADE)
-    date = models.DateField()
-    swap = models.FloatField()
+    validity = models.DateField()
+    attractive = ArrayField(models.BooleanField(), size=5, default=list)
 
     def __str__(self):
-        return self.swap
+        return self.bond + " " + self.validity
+
+class SwapProposition(CreateUpdateModel, models.Model):
+    STATUS = (
+        ('P', 'Pending'),
+        ('A', 'Accepted'),
+        ('R', 'Rejected'),
+    )
+    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
+    operation = models.ForeignKey(SwapOperation, on_delete=models.CASCADE)
+    proposer = models.ForeignKey(User, on_delete=models.CASCADE)
+    proposition = models.ForeignKey(Bond, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, default='P')
+    accepted_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return self.operation + " " + self.proposer + " " + self.status

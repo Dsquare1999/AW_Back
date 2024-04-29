@@ -41,6 +41,7 @@ class AdminBond(CreateUpdateModel, models.Model):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     isin = models.CharField(max_length=255, unique=True)
 
+    country = models.CharField(max_length=100)
     space = models.CharField(max_length=255, choices=SPACES, default='UEMOA')
     description = models.TextField(default='')
     entity = models.CharField(max_length=20, choices = ENTITIES, default = 0)
