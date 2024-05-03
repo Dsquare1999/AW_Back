@@ -95,7 +95,7 @@ class SpreadPropositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SpreadProposition
-        exclude = ['deleted', 'created_at', 'updated_at']
+        exclude = ['deleted']
 
     def validate_operation(self, value):
         """
