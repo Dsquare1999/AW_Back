@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from bilan.models import Bilan
+from backoffice.models import AdminBond
 
 from .models import Bond, BondPortofolio
 from .serializers import BondSerializer, BondPortofolioSerializer
@@ -32,15 +33,17 @@ class BondsViewset(viewsets.ModelViewSet):
         queryset = Bond.objects.filter(user=user, deleted=False)
         return queryset
     
-
+ 
     def create(self, request, *args, **kwargs):
 
         try:
             user = request.user
+            admin_bond = AdminBond.objects.get(isin=request.data['isin'])
             bilan, _ = Bilan.objects.get_or_create(user=user)
             portofolio, _ = BondPortofolio.objects.get_or_create(user=user, defaults={'name': 'My Portfolio', 'bilan': bilan})
 
             request.data["user"] = user.id
+            request.data["isin"] = admin_bond.id
             request.data["portofolio"] = portofolio.id
 
             serializer = self.get_serializer(data=request.data)

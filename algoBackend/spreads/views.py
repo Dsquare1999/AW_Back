@@ -1,5 +1,5 @@
 from datetime import datetime
-from requests import Response
+from rest_framework.response import Response
 
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
@@ -18,8 +18,23 @@ class SpreadOperationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return SpreadOperationCreateSerializer if self.action == 'create' else SpreadOperationSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            user = request.user
+
+            request.data["user"] = user.id
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
     @action(detail=False, methods=['get'], url_path='my_spread_operations', url_name='my_spread_operations')
     def my_operations(self, request):

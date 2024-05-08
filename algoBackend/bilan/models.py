@@ -16,3 +16,6 @@ class CreateUpdateModel(models.Model):
 class Bilan(CreateUpdateModel, models.Model):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "Bilan " + str(self.user)

@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from .models import Bond, BondPortofolio
+from backoffice.serializers import AdminBondSerializer
 
 
 class BondSerializer(serializers.ModelSerializer):
     annual_coupon = serializers.FloatField(required=False)
-
+    admin_bond = AdminBondSerializer(source='isin', read_only=True)
+    
     class Meta:
         model = Bond
         exclude = ['deleted', 'created_at', 'updated_at']

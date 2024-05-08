@@ -19,3 +19,4 @@ class AdminBondSerializer(serializers.ModelSerializer):
         if AdminBond.objects.filter(isin=value).exists():
             raise serializers.ValidationError("A Bond with this ISIN already exists")
         return value
+    

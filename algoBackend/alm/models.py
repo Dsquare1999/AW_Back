@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from accounts.models import User
 from bilan.models import Bilan
+from backoffice.models import AdminBond
 
 # Create your models here.
 
@@ -25,7 +26,6 @@ class BondPortofolio(CreateUpdateModel, models.Model):
 
 
 class Bond(CreateUpdateModel, models.Model):
-
     PERIODS = (
         ('T', 'Trimestrial'),
         ('S', 'Semestrial'),
@@ -42,7 +42,7 @@ class Bond(CreateUpdateModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     portofolio = models.ForeignKey(BondPortofolio, related_name="bond", on_delete=models.CASCADE)
 
-    isin = models.CharField(max_length=255)
+    isin = models.ForeignKey(AdminBond, related_name="alm_bond", on_delete=models.CASCADE)
 
     outstanding = models.FloatField() # Encours (in millions)
     issuer = models.CharField(max_length=100)
@@ -65,5 +65,9 @@ class Bond(CreateUpdateModel, models.Model):
     valorisations = models.JSONField(default=dict)
     duration_macaulay = models.JSONField(default=dict)
 
+    @property
+    def admin_bond(self):
+        return self.isin
+    
     def __str__(self):
         return f"{self.isin} {self.user}"

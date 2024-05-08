@@ -18,10 +18,10 @@ class CreateUpdateModel(models.Model):
 
 class SpreadOperation(CreateUpdateModel, models.Model):
     ORDERS = (
-        (0, 'Minimum Volume Order'),
-        (1, 'Volume Available Order'),
-        (2, 'All or None Order'),
-        (3, 'Complex Order'),
+        ('MinVol', 'Minimum Volume Order'),
+        ('VolAvail', 'Volume Available Order'),
+        ('AllNone', 'All or None Order'),
+        ('Complex', 'Complex Order'),
     )
 
     TYPE = (
@@ -39,7 +39,7 @@ class SpreadOperation(CreateUpdateModel, models.Model):
     adviced_ask = models.FloatField(blank=True, null=True)
     spread = models.FloatField()
     quantity = models.IntegerField()
-    order = models.IntegerField(choices=ORDERS, default=0)
+    order = models.CharField(max_length=10, choices=ORDERS, default='MinVol')
     type = models.CharField(max_length=10, choices=TYPE, default='B')
     validity = models.DateField()
     # attractive = ArrayField(models.BooleanField(), size=5, blank=True, null=True)
