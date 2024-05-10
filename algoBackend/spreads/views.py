@@ -18,13 +18,9 @@ class SpreadOperationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return SpreadOperationCreateSerializer if self.action == 'create' else SpreadOperationSerializer
 
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)
-
     def create(self, request, *args, **kwargs):
         try:
             user = request.user
-
             request.data["user"] = user.id
 
             serializer = self.get_serializer(data=request.data)

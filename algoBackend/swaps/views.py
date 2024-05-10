@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.shortcuts import render
 
 # Create your views here.
@@ -18,8 +18,22 @@ class SwapOperationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return SwapOperationCreateSerializer if self.action == 'create' else SwapOperationSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            validity_date = datetime.now() + timedelta(days=7)
+
+            request.data["user"] = user.id
+            request.data["validity"] = validity_date.date()
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
     @action(detail=False, methods=['get'], url_path='my_swap_operations', url_name='my_swap_operations')
     def my_swap_operations(self, request):

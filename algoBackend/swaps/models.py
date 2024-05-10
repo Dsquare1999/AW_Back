@@ -18,12 +18,22 @@ class CreateUpdateModel(models.Model):
 class SwapOperation(CreateUpdateModel, models.Model):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bond = models.ForeignKey(Bond, on_delete=models.CASCADE)
+
+    offer = models.ForeignKey(Bond, on_delete=models.CASCADE)
+    offer_duration = models.FloatField(default=0.0)
+    offer_quantity = models.IntegerField(default=0)
+    offer_return = models.FloatField(default=0.0)
+    offer_country = models.CharField(max_length=100, blank=True, null=True)
+
     validity = models.DateField()
-    attractive = ArrayField(models.BooleanField(), size=5, default=list)
+
+    demand_duration = models.FloatField(default=0.0)
+    demand_quantity = models.IntegerField(default=0)
+    demand_return = models.FloatField(default=0.0)
+    demand_country = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.bond + " " + self.validity
+        return str(self.offer)
 
 class SwapProposition(CreateUpdateModel, models.Model):
     STATUS = (
@@ -39,4 +49,4 @@ class SwapProposition(CreateUpdateModel, models.Model):
     accepted_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
-        return self.operation + " " + self.proposer + " " + self.status
+        return str(self.operation) + " " + str(self.proposer)
