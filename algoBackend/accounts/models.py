@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
@@ -10,6 +11,7 @@ AUTH_PROVIDERS ={'email':'email', 'google':'google', 'github':'github', 'linkedi
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True, editable=False) 
+    # id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     email = models.EmailField(
         max_length=255, verbose_name=_("Email Address"), unique=True
     )

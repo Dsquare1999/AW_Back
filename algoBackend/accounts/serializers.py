@@ -15,6 +15,11 @@ from .utils import send_normal_email
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
+class MinimalUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=['id', 'email', 'first_name', 'last_name']
+        
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     password2= serializers.CharField(max_length=68, min_length=6, write_only=True)
@@ -49,7 +54,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
+        fields = ['id', 'email', 'password', 'full_name', 'access_token', 'refresh_token']
 
     def validate(self, attrs):
         email = attrs.get('email')
@@ -62,6 +67,7 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed("Email is not verified")
         tokens=user.tokens()
         return {
+            'id':user.id,
             'email':user.email,
             'full_name':user.get_full_name,
             "access_token":str(tokens.get('access')),

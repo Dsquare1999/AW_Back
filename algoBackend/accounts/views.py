@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from accounts.models import OneTimePassword
-from accounts.serializers import PasswordResetRequestSerializer,LogoutUserSerializer, UserRegisterSerializer, LoginSerializer, SetNewPasswordSerializer
+from accounts.serializers import PasswordResetRequestSerializer,LogoutUserSerializer, UserRegisterSerializer, LoginSerializer, MinimalUserSerializer, SetNewPasswordSerializer
 from rest_framework import status
 from .utils import send_generated_otp_to_email
 from django.utils.http import urlsafe_base64_decode
@@ -56,6 +56,14 @@ class LoginUserView(GenericAPIView):
     def post(self, request):
         serializer= self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MeView(GenericAPIView):
+    serializer_class= MinimalUserSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get(self, request):
+        serializer=self.serializer_class(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

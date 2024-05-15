@@ -41,6 +41,8 @@ ALLOWED_HOSTS = ['*', 'http://localhost:3000']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,11 +50,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
 
     # Auth apps
+    'channels',
     'accounts',
     'social_accounts',
 
@@ -61,6 +65,8 @@ INSTALLED_APPS = [
     'dat',
     'eib',
     'pib',
+    'room',
+    'chat',
     'refi',
     'bilan',
     'swaps',
@@ -106,7 +112,16 @@ TEMPLATES = [
     },
 ]
 
+# Setup ASGI application similar to WSGI application that comes preconfigured with Django
 WSGI_APPLICATION = 'algoBackend.wsgi.application'
+ASGI_APPLICATION = 'algoBackend.asgi.application'
+
+#Add the default InMemory Channel layer for developemt. In production Django recommends to use something like Redis
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 AUTH_USER_MODEL='accounts.User'
 

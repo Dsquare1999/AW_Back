@@ -47,6 +47,8 @@ router.register(r'swap_propositions', SwapPropositionViewset, basename='swap_pro
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
+    path('api/v1/', include('room.urls')),  
+    # path('api/v1/chat/', include('chat.urls')),
     path('api/v1/admin-bonds/', AdminBondList.as_view(), name='admin_bond_list'),
     path('api/v1/auth/', include("accounts.urls")),
     path('api/v1/auth/', include('social_accounts.urls'))
