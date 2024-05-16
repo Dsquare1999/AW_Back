@@ -30,4 +30,4 @@ class Message(CreateUpdateModel, models.Model):
         return str(self.room) + " " + str(self.user)
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('created_at',)
