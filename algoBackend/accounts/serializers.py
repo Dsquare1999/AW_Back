@@ -18,7 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 class MinimalUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id', 'email', 'first_name', 'last_name']
+        fields=['id', 'email', 'first_name', 'last_name', 'is_staff']
         
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)

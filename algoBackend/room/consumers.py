@@ -5,6 +5,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from .models import Message, Room
 from accounts.models import User
+from accounts.serializers import MinimalUserSerializer
+from .generator import Generator
 import logging
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -33,6 +35,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = data['data']['user']
         room = data['data']['room']
         read_by = data['data']['read_by']
+        isPrompted = data['data']['isPrompted']
+
         print(f"Received message: {message} from {user} in room {room}")
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -44,6 +48,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'read_by': read_by
             }
         )
+        if(isPrompted):
+            print(f"Prompting GPT-3 for response in room {room}")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'gpt_message',
+                    'message': message,
+                    'user': user,
+                    'room': room,
+                    'read_by': read_by
+                }
+            )
     
     async def chat_message(self, event):
         message = event['message']
@@ -63,6 +79,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'room': room,
             'read_by': read_by
         }))
+
+    async def gpt_message(self, event):
+        try:
+            message = event['message']
+            room = event['room']
+            read_by = event['read_by']
+            algofriend = await sync_to_async(User.objects.filter(email='algofriend@algoway.com').first)()
+            if algofriend is not None:
+                algofriend_data = MinimalUserSerializer(algofriend).data
+            else:
+                algofriend_data = None
+                
+            GPT = Generator()
+            message = GPT.generated_answer(message)
+            
+            await self.save_message(algofriend, room, message)
+        
+            print(f"Sent message: {message} in room {room}")
+            await self.send(text_data=json.dumps({
+                'message': message,
+                'user': algofriend_data,
+                'room': room,
+                'read_by': read_by.append(algofriend_data.id)
+            }))
+
+        except Exception as e:
+            print("Something while generating went wrong here ...")
+            return None
+        
 
     @sync_to_async
     def save_message(self, user, room, message):
