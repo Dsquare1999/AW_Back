@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from accounts.serializers import MinimalUserSerializer
 
 class RoomSerializer(serializers.ModelSerializer):
-    user = MinimalUserSerializer(read_only=True)
     participants = MinimalUserSerializer(read_only=True, many=True)
     messages = serializers.SerializerMethodField()
 
@@ -22,6 +21,8 @@ class RoomSerializer(serializers.ModelSerializer):
             return None
 
 class MessageSerializer(serializers.ModelSerializer):
+    user = MinimalUserSerializer(read_only=True)
+
     class Meta:
         model = Message
         exclude = ['id', 'deleted', 'updated_at']

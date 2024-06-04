@@ -30,14 +30,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(data)
         message = data['data']['content']
         user = data['data']['user']
         room = data['data']['room']
         read_by = data['data']['read_by']
         isPrompted = data['data']['isPrompted']
 
-        print(f"Received message: {message} from {user} in room {room}")
+        print(f"Received message: {message} from {user} in room {room} and read by {read_by}")
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -48,7 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'read_by': read_by
             }
         )
-        if(isPrompted):
+        
+        if isPrompted:
             print(f"Prompting GPT-3 for response in room {room}")
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -60,15 +61,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'read_by': read_by
                 }
             )
+
     
     async def chat_message(self, event):
         message = event['message']
         user = event['user']
         room = event['room']
         read_by = event['read_by']
-
-        print("Event printing.........")
-        print(event)
 
         await self.save_message(user, room, message)
 
@@ -82,6 +81,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def gpt_message(self, event):
         try:
+            user = event['user']
             message = event['message']
             room = event['room']
             read_by = event['read_by']
@@ -90,18 +90,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 algofriend_data = MinimalUserSerializer(algofriend).data
             else:
                 algofriend_data = None
-                
-            GPT = Generator()
-            message = GPT.generated_answer(message)
             
-            await self.save_message(algofriend, room, message)
-        
-            print(f"Sent message: {message} in room {room}")
+            read_by.append(algofriend_data['id'])
+
+            GPT = Generator(user)
+            message = await GPT.generated_answer(message)
+            
+            await self.save_message(algofriend_data, room, message) 
             await self.send(text_data=json.dumps({
                 'message': message,
                 'user': algofriend_data,
                 'room': room,
-                'read_by': read_by.append(algofriend_data.id)
+                'read_by': read_by
             }))
 
         except Exception as e:

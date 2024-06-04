@@ -19,6 +19,9 @@ class Room(CreateUpdateModel, models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('-created_at',)
+
 class Message(CreateUpdateModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     room = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
