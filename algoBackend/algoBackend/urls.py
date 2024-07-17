@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 from bilan.views import BilanViewset
 from alm.views import BondsViewset, BondPortofolioViewset
 from backoffice.views import AdminBondViewSet
@@ -53,3 +56,6 @@ urlpatterns = [
     path('api/v1/auth/', include("accounts.urls")),
     path('api/v1/auth/', include('social_accounts.urls'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

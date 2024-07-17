@@ -16,10 +16,27 @@ class CreateUpdateModel(models.Model):
 
 
 class BondPortofolio(CreateUpdateModel, models.Model):
+    START = (
+        ('0', 'Blank'),
+        ('1', 'Active Portofolio'),
+    )
+
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bilan = models.ForeignKey(Bilan, related_name="bond_portofolio", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    is_simulated = models.BooleanField(default=False)
+    start = models.CharField(max_length=1, choices=START, default='0')
+    is_active = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['bilan'],
+                condition=models.Q(is_active=True),
+                name='unique_active_bond_portofolio_per_bilan'
+            )
+        ]
 
     def __str__(self):
         return self.name

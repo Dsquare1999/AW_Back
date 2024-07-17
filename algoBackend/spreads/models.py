@@ -45,8 +45,9 @@ class SpreadOperation(CreateUpdateModel, models.Model):
     # attractive = ArrayField(models.BooleanField(), size=5, blank=True, null=True)
 
     description = models.TextField(default='', blank=True, null=True)
-    isPublic = models.BooleanField(default=True)
-    isPublished = models.BooleanField(default=True)
+    is_public = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True)
+    is_simulated = models.BooleanField(default=False)
 
     def __str__(self):
         return  "Spread Operation" + str(self.admin_bond)

@@ -3,6 +3,7 @@ from multiprocessing import context
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework import viewsets
 from accounts.models import OneTimePassword
 from accounts.serializers import PasswordResetRequestSerializer,LogoutUserSerializer, UserRegisterSerializer, LoginSerializer, MinimalUserSerializer, SetNewPasswordSerializer
 from rest_framework import status
@@ -24,14 +25,12 @@ class RegisterView(GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             user_data=serializer.data
-            send_generated_otp_to_email(user_data['email'], request)
+            # send_generated_otp_to_email(user_data['email'], request)
             return Response({
                 'data':user_data,
                 'message':'thanks for signing up a passcode has be sent to verify your email'
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class VerifyUserEmail(GenericAPIView):

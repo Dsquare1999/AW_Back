@@ -16,6 +16,17 @@ class CreateUpdateModel(models.Model):
 class Bilan(CreateUpdateModel, models.Model):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable = False)
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
+    is_simulated = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user'],
+                condition=models.Q(is_active=True),
+                name='unique_active_bilan_per_user'
+            )
+        ]
+    
     def __str__(self):
         return "Bilan " + str(self.user)

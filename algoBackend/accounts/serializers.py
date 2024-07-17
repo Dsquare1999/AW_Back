@@ -13,12 +13,22 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import send_normal_email
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from .models import Profile
 
 
 class MinimalUserSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
+
     class Meta:
         model=User
-        fields=['id', 'email', 'first_name', 'last_name', 'is_staff']
+        fields=['id', 'email', 'first_name', 'last_name', 'is_staff', 'profile']
+
+    def get_profile(self, obj):
+        try:
+            profile = Profile.objects.get(user=obj)
+            return ProfileSerializer(profile).data
+        except Profile.DoesNotExist:
+            return None
         
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
@@ -42,7 +52,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data.get('first_name'),
             last_name=validated_data.get('last_name'),
             password=validated_data.get('password')
-            )
+        )
         return user
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -74,6 +84,12 @@ class LoginSerializer(serializers.ModelSerializer):
             "refresh_token":str(tokens.get('refresh'))
         }
 
+class ProfileSerializer(serializers.ModelSerializer):
+    qr_code_url = serializers.ImageField(source='qr_code', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['qr_code_url']
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)

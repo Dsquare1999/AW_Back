@@ -42,5 +42,4 @@ class BondPortofolioSerializer(serializers.ModelSerializer):
             return serializer_bond.data
         except Exception as e:
             return None
-        
 

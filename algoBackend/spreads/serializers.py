@@ -8,7 +8,7 @@ from datetime import datetime
 class SpreadOperationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpreadOperation
-        exclude = ['deleted', 'created_at', 'updated_at', 'isPublic', 'isPublished']
+        exclude = ['deleted', 'created_at', 'updated_at', 'is_public', 'is_published']
 
 class SpreadOperationSerializer(serializers.ModelSerializer):
     propositions = serializers.SerializerMethodField()
@@ -16,7 +16,7 @@ class SpreadOperationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SpreadOperation
-        exclude = ['deleted', 'created_at', 'updated_at', 'isPublic', 'isPublished']
+        exclude = ['deleted', 'created_at', 'updated_at', 'is_public', 'is_published']
 
     def get_propositions(self, instance):
         try:

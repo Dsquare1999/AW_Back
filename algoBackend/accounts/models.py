@@ -4,6 +4,11 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 
+import qrcode
+from io import BytesIO
+from PIL import Image
+from django.core.files import File
+
 from accounts.managers import UserManager
 # Create your models here.
 
@@ -45,6 +50,27 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def get_full_name(self):
         return f"{self.first_name.title()} {self.last_name.title()}"
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True)
+
+    def save(self, *args, **kwargs):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(self.user.email)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="#FAA41A", back_color="#582900")
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        file_name = f'{self.user.first_name}_{self.user.last_name}_qr.png'
+        self.qr_code.save(file_name, File(buffer), save=False)
+        super().save(*args, **kwargs)
 
 
 class OneTimePassword(models.Model):
